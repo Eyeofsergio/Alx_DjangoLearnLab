@@ -10,4 +10,5 @@ class BookAdmin(admin. ModelAdmin):
    
 # Model Register
 
-admin.site.register(Book, BookAdmin)
+
+
