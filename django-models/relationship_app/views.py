@@ -62,4 +62,4 @@ def edit_book(request):
 def delete_book(request):
     return render(request, 'relationship_app/delete_book.html')
 
-    
+    @permission_required('relationship_app.can 'add_book/', 'edit_book/', 'delete_book')
