@@ -4,7 +4,7 @@ from django.views.generic.detail import DetailView
 from .models import Library
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators omport permission_required 
+from django.contrib.auth.decorators import permission_required 
 from django.contrib.auth.decortors import user_passes_test
 
 # Views List
