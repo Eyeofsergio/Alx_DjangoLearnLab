@@ -6,6 +6,10 @@ from django.contrib.auth import views as auth_views
 from librarian_view import librarian_view
 from member_view import member_view
 from django.contrib.auth iport views as auth_views
+from .views import(
+    add_book,
+    edit_book,
+    delete_book,
 
 urlpatterns = [
     path('books/', list_books, name='list_books'),
@@ -14,6 +18,10 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name='registration/'logout.html'), name='logout'),
     path('register/', views.register(), name='register'),
     path(admin/', views.admin_view, name='admin'),
+    path('add_book/', add_book, name='add_book'),
+    path('edit_book/<int:pk>/', edit_book, name='edit_book'),
+    path('delete_book/<int:pk>/', delete_book, name='delete_book'),
+    
 ]
 
 
