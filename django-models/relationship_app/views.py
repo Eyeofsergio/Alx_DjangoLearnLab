@@ -8,36 +8,6 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decortors import user_passes_test
 
 # Views List
-# login required
-def add_book(request):
-    if request.method == 'POST':
-        form = BookForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('list_books')
-    else:
-        form = BookForm()
-    return render(request, 'add_book.html', {'form': form})
-
-@login_required 2
-def edit_book(request, pk):
-    book = get_object_or_404(Book, pk=pk)
-    if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
-        if form.is_valid():
-            form.save()
-            return redirect('list_books')
-    else:
-        form = BookForm(instance=book)
-    return render(request, 'edit_book.html', {'form': form})
-
-@login_required 3
-def delete_book(request, pk):
-    book = get_object_or_404(Book, pk=pk)
-    if request.method == 'POST':
-        book.delete()
-        return redirect('list_books')
-    return render(request, 'delete_book.html', {'book': book})
 
 def list_books(request):
     context = {
