@@ -9,6 +9,23 @@ class CustomUser(AbstractUser):
         return self.username
 
 # Create your models here.
+class Document(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Meta:
+        permissions = [
+            ("can_view", "Can view documents"),
+            ("can_create", "Can create documents"),
+            ("can_edit", "Can edit documents"),
+            ("can_delete", "Can delete documents"),
+        ]
+
+    def __str__(self):
+        return self.title
+
+
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=100)
