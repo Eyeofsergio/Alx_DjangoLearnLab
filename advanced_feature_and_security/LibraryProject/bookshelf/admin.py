@@ -12,6 +12,13 @@ class CustomUserAdmin(UserAdmin):
         (None, {'fields': ('username', 'email', 'password')}),
         ('Personal Info', {'fields': ('date_of_birth', 'profile_photo')}),
         ('permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+  )
+  add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2', 'date_of_birth', 'profile_photo')}
+        ),
+    )
       
 # Register your models here.
 admin.site.register(Book, Bookadmin)
