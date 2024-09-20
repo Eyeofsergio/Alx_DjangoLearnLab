@@ -84,7 +84,8 @@ DATABASES = {
         'PORT' : '5432',
     }
 }
-
+LOGIN_REDIRECT_URL = 'profile'
+LOGOUT_REDIRECT_URL = 'login'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -121,7 +122,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'blog/static']
 
+TEMPLATES = [
+    {
+        'BACKEND' : 'django.template.backends.django.DjangoTemplates',
+        'DIRS' : [BASE_DIR / 'blog/templates'],
+        
+    },
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
