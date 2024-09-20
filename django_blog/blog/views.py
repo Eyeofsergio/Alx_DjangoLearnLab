@@ -1,8 +1,14 @@
+from django.contrib.auth.forms import UserCreationForms
+from django import UserCreationForms
+from django.contrib.auth.models import User
 from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect, get_object_or_404
 from blog.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, CommentForm, PostForm
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from .models import Post, Comment
+from .forms import CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.views.generic import (
@@ -17,23 +23,69 @@ from blog.models import Post, Comment
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from django.db.models import Q
-from taggit.models import Tag
+
 
 
 # Create your views here.
-def register(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Your Account has been created successfully")
-            return redirect('login')
-    else:
-        form = UserRegisterForm()
+class CustomerUserCreationForm(UserRegisterForm):
 
-    return render(request, 'blog/register.html', {'form': form})
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user
+
+    def register(request):
+        if request.method == 'POST':
+            form = UserRegisterForm(request.POST)
+            if form.is_valid():
+                user = form.save()
+            messages.success(request, "Your Account has been created successfully")
+            return redirect('profile')
+        else:
+            form = UserRegisterForm()
+
+        return render(request, 'blog/register.html', {'form': form})
 
 @login_required
+
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', post_id=post.id)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/add_comment.html', {'form': form})
+
+@login_required
+
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', post_id=comment.post.id)
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'blog/edit_comment.html', {'form': form})
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = post.comments.all()
+    return render(request, 'blog/post_detail.html', {'post': post, 'comments': comments})
+
 def profile(request):
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -169,7 +221,7 @@ class PostByTagListView(ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        self.tag = get_object_or_404(Tag, slug=self.kwargs.get('tag_slug'))
+        self.tag = get_object_or_404(slug=self.kwargs.get('tag_slug'))
         return Post.objects.filter(tags__slug=self.tag.slug)
     
     def get_context_data(self, **kwargs):
