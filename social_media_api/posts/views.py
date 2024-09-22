@@ -3,6 +3,8 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
+from posts.permissions import IsAuthorOrReadOnly
+from rest_framework.filters import SearchFilter
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
