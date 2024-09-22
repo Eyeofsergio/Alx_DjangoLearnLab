@@ -1,5 +1,5 @@
-from django.contrib.auth.forms import UserCreationForms
-from django import UserCreationForms
+from django.contrib.auth.forms import UserCreationForm
+from django import UserCreationForm
 from django.contrib.auth.models import User
 from typing import Any
 from django.db.models.query import QuerySet
@@ -23,7 +23,8 @@ from blog.models import Post, Comment
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from django.db.models import Q
-
+from django.shortcuts import render
+from taggit.models import Tag
 
 
 # Create your views here.
@@ -80,6 +81,20 @@ def edit_comment(request, comment_id):
     else:
         form = CommentForm(instance=comment)
     return render(request, 'blog/edit_comment.html', {'form': form})
+
+@login_required
+def create_post(request):
+     if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            form.save_m2m()  # Save tags
+            return redirect('post_detail', post_id=post.id)
+        else:
+            form = PostForm()
+        return render(request, 'blog/post_form.html', {'form': form})
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -196,6 +211,14 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         comment = self.get_object()
         return comment.author == self.request.user
     
+def search_posts(request):
+    query = request.GET.get('q')
+    results = Post.objects.filter(
+        Q(title__icontains=query) | 
+        Q(content__icontains=query) | 
+        Q(tags__name__icontains=query)
+    ).distinct()
+    return render(request, 'blog/search_results.html', {'results': results, 'query': query})
 
 def search(request):
     query = request.GET.get('q')
@@ -215,6 +238,12 @@ def search(request):
 
     return render(request, 'blog/search_results.html', context)
 
+
+def posts_by_tag(request, slug):
+    tag = get_object_or_404(Tag, slug=slug)
+    posts = Post.objects.filter(tags=tag)
+    return render(request, 'blog/posts_by_tag.html', {'tag': tag, 'posts': posts})
+
 class PostByTagListView(ListView):
     model = Post
     template_name = 'blog/posts_by_tag.html'
@@ -228,3 +257,9 @@ class PostByTagListView(ListView):
         context = super().get_context_data(**kwargs)
         context['tags'] = self.tag
         return context
+    
+def custom_404_view(request, expection=None):
+    return render(request, 'blog/404.html', status=404)
+
+def custom_500_view(request):
+    return render(request,'blog/500.html',status=500)
