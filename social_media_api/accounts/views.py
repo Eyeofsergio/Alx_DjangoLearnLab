@@ -15,6 +15,7 @@ from .models import CustomUser
 from .models import Post
 from .serializers import PostSerializer
 from .serializers import CustomUserSerializer
+from rest_framework import permissions 
 
 @api_view(['POST'])
 def follow_user(request, user_id):
