@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from .views import RegisterView, CustomAuthToken
 from .import views
+from .views import FollowUserView, UnfollowUserView, ListUsersView, UserProfileView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +27,6 @@ urlpatterns = [
     path('follow/<int:user_id>/', views.follow_user, name='follow-user'),
     path('unfollow/<int:user_id>/', views.unfollow_user, name='unfollow-user'),
     path('feed/', views.user_feed, name='user-feed'),
+    path('users/', ListUsersView.as_view(), name='list-users'),
+    path('profile/<int:id>/', UserProfileView.as_view(), name='user-profile'),
 ]
