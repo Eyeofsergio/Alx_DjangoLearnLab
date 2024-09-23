@@ -12,13 +12,19 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'bio', 'profile_picture', 'followers', 'following']
+        read_only_fields = ['followers', 'following']
 
 class UserSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'bio', 'profile_picture')
 
 class RegisterSerializer(serializers.ModelSerializer):
+    
+    password = serializers.Charfield()
+    password2 = serializers.CharField(label='confirm password') 
+
     class Meta:
         model = User
         fields = ('username', 'password', 'email')
@@ -30,5 +36,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
         )
+        user = get_user_model().objects.create_user(**validated_data)
         Token.objects.create(user=user)
         return user
