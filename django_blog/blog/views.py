@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import UserCreationForm
 from django.contrib.auth.models import User
 from typing import Any
+from django.urls import reverse_lazy
 from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect, get_object_or_404
 from blog.forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, CommentForm, PostForm
@@ -177,21 +178,26 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
     
+# Create a new comment
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
-    form_class = CommentForm
+    fields = ['content']
+    template_name = 'blog/comment_form.html'
 
     def form_valid(self, form):
+        form.instance.post_id = self.kwargs['pk']
         form.instance.author = self.request.user
         form.instance.post = get_object_or_404(Post, pk=self.kwargs['pk'])
         form.save()
         return redirect('post-detail', pk=self.kwargs['pk'])
     
+# Update Existing Comment
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
+    fields = ['content']
 
     def get_success_url(self):
         return reverse('post-detail', kwargs={'pk': self.object.post.pk})
@@ -199,10 +205,13 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         comment = self.get_object()
         return comment.author == self.request.user
+
+ # Delete Comment 
     
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     form_class = CommentForm
+    success_url = reverse_lazy('post-list')
 
     def get_success_url(self):
         return reverse('post-detail', kwargs={'pk': self.object.post.pk})
