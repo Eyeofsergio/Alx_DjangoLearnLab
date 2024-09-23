@@ -23,6 +23,7 @@ urlpatterns = [
     path('tags/<slug:slug>/', blog_views.posts_by_tag, name='posts-by-tag'),
     path('profile/edit/',auth_views.edit_profile, name='edit_profile'),
     path('', views.index, name='home'),
+     path('tags/<slug:tag_slug>/', views.PostByTagListView.as_view(), name='post-by-tag'),
 
 
 

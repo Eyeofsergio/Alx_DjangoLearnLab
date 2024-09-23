@@ -26,6 +26,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import render
 from taggit.models import Tag
+from .models import Post 
 
 
 # Create your views here.
@@ -259,11 +260,14 @@ class PostByTagListView(ListView):
     model = Post
     template_name = 'blog/posts_by_tag.html'
     context_object_name = 'posts'
+    paginate_by = 10
 
     def get_queryset(self):
+        tag_slug = self.kwargs.get('tag_slug')
+        tag = get_object_or_404(Tag, slug=tag_slug)
         self.tag = get_object_or_404(slug=self.kwargs.get('tag_slug'))
-        return Post.objects.filter(tags__slug=self.tag.slug)
-    
+        return Post.objects.filter(tags__in=[tag])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tags'] = self.tag
