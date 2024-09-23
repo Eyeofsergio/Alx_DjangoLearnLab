@@ -34,6 +34,11 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
+# PORT SETTINGS (DEFAULT IS '8000')
+
+import os
+
+Port = os.getenv('PORT', '8000')
 
 # Application definition
 
