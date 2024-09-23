@@ -1,5 +1,5 @@
 """
-URL configuration for posts project.
+URL configuration for notifications project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -15,21 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include 
 from django.urls import path
-from rest_framework.routers import DefaultRouter
-from .views import PostViewSet, CommentViewSet
-from .views import UserFeedView
-from .views import LikePostView, UnlikePostView
-
-router = DefaultRouter
-router.register(r'posts', PostViewSet)
-router.register(r'comments', CommentViewSet)
+from .views import NotificationListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(router.urls)),
-    path('feed/', UserFeedView.as_view(), name='user-feed'),
-    path('<int:pk>/like/', LikePostView.as_view(), name='like-post'),
-    path('<int:pk>/unlike/', UnlikePostView.as_view(), name='unlike-post'),
+    path('', NotificationListView.as_view(), name='notifications'),
 ]
