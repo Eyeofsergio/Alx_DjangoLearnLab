@@ -210,6 +210,8 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
+    fields = ['content']
+    template_name = 'blog/comment_confirm_delete.html'
     form_class = CommentForm
     success_url = reverse_lazy('post-list')
 
