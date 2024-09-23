@@ -1,12 +1,16 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework import viewsets, permissions
-from .models import Post, Comment
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from posts.permissions import IsAuthorOrReadOnly
 from rest_framework.filters import SearchFilter
 from accounts.models import CustomUser
+from notifications.models import Notification
+from notifications.serializers import NotificationSerializer
 
 class UserFeedView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
