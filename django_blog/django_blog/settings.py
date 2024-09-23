@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'crispy forms',
     'blog.models',
     'taggit'
+    'Post'
 ]
 
 MIDDLEWARE = [
