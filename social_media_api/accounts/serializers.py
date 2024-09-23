@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     
-    password = serializers.Charfield()
+    password = serializers.CharField() 
     password2 = serializers.CharField(label='confirm password') 
 
     class Meta:
