@@ -49,3 +49,34 @@ class CommentViewSet(viewsets.ModelViewSet):
         if self.action in ['update', 'partial_update', 'destroy']:
             return [permissions.IsAuthenticated(), permissions.IsAuthorOfComment()]
         return [permissions.AllowAny()]
+    
+class LikePostView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+        
+        if created:
+            # Create a notification for the post author
+            Notification.objects.create(
+                recipient=post.author,
+                actor=request.user,
+                verb='liked',
+                target=post
+            )
+            return Response({'status': 'liked'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'You have already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
+
+class UnlikePostView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        try:
+            like = Like.objects.get(user=request.user, post=post)
+            like.delete()
+            return Response({'status': 'unliked'}, status=status.HTTP_200_OK)
+        except Like.DoesNotExist:
+            return Response({'error': 'You have not liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
